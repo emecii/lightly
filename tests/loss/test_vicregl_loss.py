@@ -122,8 +122,12 @@ class TestVICRegLLoss:
             )
 
     @pytest.mark.parametrize("view_type", ["global", "local"])
+    @pytest.mark.parametrize(
+        "grid_shape",
+        [(3, 7, 7, 2), (2, 9, 7, 2), (2, 7, 9, 2)],
+    )
     def test_forward__error_view_features_and_grids_not_same_shape(
-        self, view_type: str
+        self, view_type: str, grid_shape: tuple[int, int, int, int]
     ) -> None:
         criterion = VICRegLLoss()
         global_view_features = [
@@ -136,18 +140,18 @@ class TestVICRegLLoss:
         local_view_grids = [torch.randn((2, 4, 4, 2)) for _ in range(2)]
 
         if view_type == "global":
-            global_view_grids[0] = torch.randn((2, 9, 9, 2))
+            global_view_grids[0] = torch.randn(grid_shape)
             expected_message = (
                 "global_view_features[0][1] and global_view_grids[0] must have "
                 "matching batch, height, and width but found local feature shape "
-                "(2, 7, 7, 8) and grid shape (2, 9, 9, 2)."
+                f"(2, 7, 7, 8) and grid shape {grid_shape}."
             )
         else:
-            local_view_grids[0] = torch.randn((2, 6, 6, 2))
+            local_view_grids[0] = torch.randn(grid_shape)
             expected_message = (
                 "local_view_features[0][1] and local_view_grids[0] must have "
                 "matching batch, height, and width but found local feature shape "
-                "(2, 4, 4, 8) and grid shape (2, 6, 6, 2)."
+                f"(2, 4, 4, 8) and grid shape {grid_shape}."
             )
 
         with pytest.raises(ValueError, match=re.escape(expected_message)):

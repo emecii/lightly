@@ -138,8 +138,8 @@ class VICRegLLoss(Module):
             ValueError: If the lengths of global_view_features and global_view_grids are not the same.
             ValueError: If the lengths of local_view_features and local_view_grids are not the same.
             ValueError: If only one of local_view_features or local_view_grids is set.
-            ValueError: If a local feature map and its grid do not have matching batch,
-                height, and width dimensions.
+            ValueError: If a global or local feature map and its grid do not have
+                matching batch, height, and width dimensions.
         """
         if len(global_view_features) != len(global_view_grids):
             raise ValueError(
@@ -193,7 +193,7 @@ class VICRegLLoss(Module):
         view_grids: Sequence[Tensor],
         view_type: str,
     ) -> None:
-        """Validates that every local feature map matches its grid."""
+        """Validates that every global or local feature map matches its grid."""
         for index, ((_, local_features), grid) in enumerate(
             zip(view_features, view_grids)
         ):
